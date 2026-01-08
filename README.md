@@ -25,7 +25,7 @@ It uses **yt-dlp** (Nightly builds) and **FFmpeg** to bypass modern YouTube rest
 
 You can download the latest APK from the Releases page:
 
-[** Download Latest APK**][https://github.com/TC-Mercury/Mercury_Converter_for_Android/releases/download/v1.0/MercuryConverter.apk)
+[** Download Latest APK**][https://github.com/TC-Mercury/Mercury_Converter_for_Android/releases/download/v1.0.2/MercuryConverter.apk)
 
 1.  Download `MercuryConverter.apk`.
 2.  Allow installation from unknown sources.
