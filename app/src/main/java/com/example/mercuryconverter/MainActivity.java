@@ -18,6 +18,7 @@ import com.yausername.ffmpeg.FFmpeg;
 import com.yausername.youtubedl_android.YoutubeDL;
 import com.yausername.youtubedl_android.YoutubeDLRequest;
 import com.yausername.youtubedl_android.YoutubeDLException;
+import com.yausername.youtubedl_android.DownloadProgressCallback;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -50,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
         btnDownload = findViewById(R.id.btnDownload);
         progressBar = findViewById(R.id.progressBar);
         tvStatus = findViewById(R.id.tvStatus);
+
+        btnDownload.setEnabled(false);
+        btnDownload.setText("Prepairing Engine...");
 
         // Try to initialize libraries immediately upon app launch
         try {
@@ -156,6 +160,8 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     tvStatus.setText(R.string.msg_engine_updated);
                     Toast.makeText(MainActivity.this, getString(R.string.msg_engine_updated), Toast.LENGTH_LONG).show();
+                    btnDownload.setEnabled(true);
+                    btnDownload.setText("Download");
                 });
             } catch (Exception e) {
                 Log.e(TAG, "Update Error: " + e.getMessage());
@@ -164,6 +170,8 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     tvStatus.setText(R.string.msg_update_failed);
                     Toast.makeText(MainActivity.this, getString(R.string.msg_update_failed) + ": " + errorMsg, Toast.LENGTH_LONG).show();
+                    btnDownload.setEnabled(true);
+                    btnDownload.setText("Download");
                 });
             }
         }).start();
@@ -178,102 +186,115 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Executes the download and conversion process.
-    private void startDownload() {
-        String url = editTextLink.getText().toString().trim();
+        private void startDownload() {
+            String url = editTextLink.getText().toString().trim();
 
-        if (url.isEmpty()) {
-            Toast.makeText(this, getString(R.string.error_empty_link), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        ensureMercuryDir();
-
-        progressBar.setVisibility(ProgressBar.VISIBLE);
-        tvStatus.setText(R.string.status_downloading);
-        btnDownload.setEnabled(false);
-        editTextLink.setEnabled(false);
-
-        new Thread(() -> {
-            try {
-                YoutubeDLRequest request = new YoutubeDLRequest(url);
-
-                // --- FFMPEG PATH DETECTION ---
-                // The library sometimes fails to find the FFmpeg binary automatically.(idk why)
-                // We check multiple locations manually.
-                String ffmpegPath = "";
-                File libJunkfood = new File(getApplicationContext().getApplicationInfo().dataDir, "libffmpeg.so");
-                File libFiles = new File(getApplicationContext().getFilesDir(), "libffmpeg.so");
-                File libNative = new File(getApplicationContext().getApplicationInfo().nativeLibraryDir, "libffmpeg.so");
-
-                if (libJunkfood.exists()) ffmpegPath = libJunkfood.getAbsolutePath();
-                else if (libFiles.exists()) ffmpegPath = libFiles.getAbsolutePath();
-                else if (libNative.exists()) ffmpegPath = libNative.getAbsolutePath();
-
-                // Explicitly tell yt-dlp where FFmpeg is (I spend so much time just for this!)
-                if (!ffmpegPath.isEmpty()) {
-                    request.addOption("--ffmpeg-location", ffmpegPath);
-                }
-
-                // --- AUDIO EXTRACTION SETTINGS ---
-                request.addOption("-x");
-                request.addOption("--audio-format", "mp3");
-                request.addOption("--audio-quality", "0");
-                request.addOption("--embed-metadata");
-                request.addOption("--embed-thumbnail");
-                request.addOption("--add-metadata");
-                request.addOption("--recode-video", "mp3");
-                request.addOption("--metadata-from-title", "%(artist)s - %(title)s");
-                request.addOption("-o", mercuryDir.getAbsolutePath() + "/%(artist)s - %(title)s.%(ext)s");
-
-
-                // --- YOUTUBE ANTI-BOT BYPASS ---
-                // Emulate the official Android client. Since I am using the updated Nightly engine,
-                // this bypasses the HTTP 400 and "PO Token" errors.
-                request.addOption("--extractor-args", "youtube:player_client=android");
-                request.addOption("--force-ipv4");
-                request.addOption("--no-check-certificate");
-                request.addOption("--no-playlist");
-                request.addOption("--format", "bestaudio/best");
-
-                YoutubeDL.getInstance().execute(request);
-
-                //Media scanner for phone to detect files quickly
-                MediaScannerConnection.scanFile(
-                        getApplicationContext(),
-                        new String[]{mercuryDir.getAbsolutePath()},
-                        null,
-                        (path, uri) -> {
-                            Log.i(TAG, "Media Scan completed: " + path);
-                        }
-                );
-
-                // Update UI on success
-                runOnUiThread(() -> {
-                    progressBar.setVisibility(ProgressBar.GONE);
-                    tvStatus.setText(R.string.msg_completed);
-                    btnDownload.setEnabled(true);
-                    editTextLink.setEnabled(true);
-                    editTextLink.setText("");
-                    Toast.makeText(MainActivity.this, getString(R.string.msg_saved_to) + "Download/MercuryFile", Toast.LENGTH_LONG).show();
-                });
-
-            } catch (Exception e) {
-                Log.e(TAG, "Download error", e);
-                final String msg = e.getMessage();
-
-                // Update UI on failure
-                runOnUiThread(() -> {
-                    progressBar.setVisibility(ProgressBar.GONE);
-                    if (msg.contains("ffmpeg")) {
-                        tvStatus.setText(R.string.error_conversion_failed);
-                        Toast.makeText(MainActivity.this, getString(R.string.error_ffmpeg_not_found), Toast.LENGTH_LONG).show(); // <<< Doğru String kullanılmalı
-                    } else {
-                        tvStatus.setText(getString(R.string.error_prefix) + msg);
-                    }
-                    btnDownload.setEnabled(true);
-                    editTextLink.setEnabled(true);
-                });
+            if (url.isEmpty()) {
+                Toast.makeText(this, getString(R.string.error_empty_link), Toast.LENGTH_SHORT).show();
+                return;
             }
-        }).start();
-    }
+
+            ensureMercuryDir();
+
+            progressBar.setVisibility(ProgressBar.VISIBLE);
+            tvStatus.setText(R.string.status_downloading);
+            btnDownload.setEnabled(false);
+            editTextLink.setEnabled(false);
+
+            new Thread(() -> {
+                try {
+                    YoutubeDLRequest request = new YoutubeDLRequest(url);
+
+                    // --- FFMPEG PATH DETECTION ---
+                    // The library sometimes fails to find the FFmpeg binary automatically.(idk why)
+                    // We check multiple locations manually.
+                    String ffmpegPath = "";
+                    File libJunkfood = new File(getApplicationContext().getApplicationInfo().dataDir, "libffmpeg.so");
+                    File libFiles = new File(getApplicationContext().getFilesDir(), "libffmpeg.so");
+                    File libNative = new File(getApplicationContext().getApplicationInfo().nativeLibraryDir, "libffmpeg.so");
+
+                    if (libJunkfood.exists()) ffmpegPath = libJunkfood.getAbsolutePath();
+                    else if (libFiles.exists()) ffmpegPath = libFiles.getAbsolutePath();
+                    else if (libNative.exists()) ffmpegPath = libNative.getAbsolutePath();
+
+                    // Explicitly tell yt-dlp where FFmpeg is (I spend so much time just for this!)
+                    if (!ffmpegPath.isEmpty()) {
+                        request.addOption("--ffmpeg-location", ffmpegPath);
+                    }
+
+                    // --- AUDIO EXTRACTION SETTINGS ---
+                    request.addOption("-x");
+                    request.addOption("--audio-format", "mp3");
+                    request.addOption("--audio-quality", "0");
+                    request.addOption("--embed-metadata");
+                    request.addOption("--embed-thumbnail");
+                    request.addOption("--add-metadata");
+                    request.addOption("--recode-video", "mp3");
+                    request.addOption("--metadata-from-title", "%(artist)s - %(title)s");
+                    request.addOption("-o", mercuryDir.getAbsolutePath() + "/%(artist)s - %(title)s.%(ext)s");
+
+                    // --- YOUTUBE ANTI-BOT BYPASS ---
+                    // Emulate the official Android client. Since I am using the updated Nightly engine,
+                    // this bypasses the HTTP 400 and "PO Token" errors.
+                    request.addOption("--extractor-args", "youtube:player_client=android");
+                    request.addOption("--force-ipv4");
+                    request.addOption("--no-check-certificate");
+                    request.addOption("--no-playlist");
+                    request.addOption("--format", "bestaudio/best");
+
+                    //Show download progress and download infos
+                    runOnUiThread(() -> {
+                        progressBar.setIndeterminate(false);
+                        progressBar.setMax(100);
+                        progressBar.setProgress(0);
+                    });
+
+                   YoutubeDL.getInstance().execute(request, "mercury_process", (progress, etaInSeconds, line) -> {
+                        runOnUiThread(() -> {
+                            int prog = (progress != null) ? progress.intValue() : 0;
+                            progressBar.setProgress(prog);
+                            tvStatus.setText(line);
+                        });
+                       return null;
+                   });
+
+                    //Media scanner for phone to detect files quickly
+                    MediaScannerConnection.scanFile(
+                            getApplicationContext(),
+                            new String[]{mercuryDir.getAbsolutePath()},
+                            null,
+                            (path, uri) -> {
+                                Log.i(TAG, "Media Scan completed: " + path);
+                            }
+                    );
+
+                    // Update UI on success
+                    runOnUiThread(() -> {
+                        progressBar.setVisibility(ProgressBar.GONE);
+                        tvStatus.setText(R.string.msg_completed);
+                        btnDownload.setEnabled(true);
+                        editTextLink.setEnabled(true);
+                        editTextLink.setText("");
+                        Toast.makeText(MainActivity.this, getString(R.string.msg_saved_to) + "Download/MercuryFile", Toast.LENGTH_LONG).show();
+                    });
+
+                } catch (Exception e) {
+                    Log.e(TAG, "Download error", e);
+                    final String msg = e.getMessage();
+
+                    // Update UI on failure
+                    runOnUiThread(() -> {
+                        progressBar.setVisibility(ProgressBar.GONE);
+                        if (msg.contains("ffmpeg")) {
+                            tvStatus.setText(R.string.error_conversion_failed);
+                            Toast.makeText(MainActivity.this, getString(R.string.error_ffmpeg_not_found), Toast.LENGTH_LONG).show(); // <<< Doğru String kullanılmalı
+                        } else {
+                            tvStatus.setText(getString(R.string.error_prefix) + msg);
+                        }
+                        btnDownload.setEnabled(true);
+                        editTextLink.setEnabled(true);
+                    });
+                }
+            }).start();
+        }
 }
