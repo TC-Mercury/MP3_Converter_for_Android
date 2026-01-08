@@ -5,6 +5,7 @@
     <string name="hint_link">YouTube Linkini Buraya Yapıştır</string>
     <string name="btn_download">MP3 İndir</string>
     <string name="status_ready">Hazır - Link Yapıştırın</string>
+    <string name="action_download">İndir</string>
 
     <string name="msg_checking_updates">Güncellemeler kontrol ediliyor...</string>
     <string name="msg_engine_updated">✅ Motor Güncellendi!</string>
