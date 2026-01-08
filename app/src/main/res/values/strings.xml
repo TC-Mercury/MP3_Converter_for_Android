@@ -4,6 +4,7 @@
     <string name="hint_link">Paste YouTube Link Here</string>
     <string name="btn_download">Download MP3</string>
     <string name="status_ready">Ready - Paste YouTube URL</string>
+    <string name="action_download">Download</string>
 
     <string name="msg_checking_updates">Checking for updates...</string>
     <string name="msg_engine_updated">✅ Engine Updated!</string>

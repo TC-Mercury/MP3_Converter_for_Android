@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         tvStatus = findViewById(R.id.tvStatus);
 
         btnDownload.setEnabled(false);
-        btnDownload.setText("Prepairing Engine...");
+        btnDownload.setText(R.string.msg_checking_updates);
 
         // Try to initialize libraries immediately upon app launch
         try {
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                     tvStatus.setText(R.string.msg_engine_updated);
                     Toast.makeText(MainActivity.this, getString(R.string.msg_engine_updated), Toast.LENGTH_LONG).show();
                     btnDownload.setEnabled(true);
-                    btnDownload.setText("Download");
+                    btnDownload.setText(R.string.action_download);
                 });
             } catch (Exception e) {
                 Log.e(TAG, "Update Error: " + e.getMessage());
@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
                     tvStatus.setText(R.string.msg_update_failed);
                     Toast.makeText(MainActivity.this, getString(R.string.msg_update_failed) + ": " + errorMsg, Toast.LENGTH_LONG).show();
                     btnDownload.setEnabled(true);
-                    btnDownload.setText("Download");
+                    btnDownload.setText(R.string.action_download);
                 });
             }
         }).start();
