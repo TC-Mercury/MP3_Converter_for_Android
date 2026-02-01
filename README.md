@@ -13,11 +13,11 @@ It uses **yt-dlp** (Nightly builds) and **FFmpeg** to bypass modern YouTube rest
 
 ##  Features:
 
-* ** MP3 Conversion:** Automatically extracts audio and converts it to high-quality MP3 using a native FFmpeg binary.
-* ** Anti-Bot Bypass:** Uses the `_NIGHTLY` update channel and client emulation (`android_testsuite`) to bypass YouTube's latest "PO Token" and bot protections.
-* ** Multi-Language:** Full support for **English** 🇺🇸 and **Turkish** 🇹🇷 (Auto-detects system language).
-* ** Easy Access:** Saves files directly to the public `Downloads/MercuryFile` directory.
-* ** Auto-Update:** Checks and updates the internal yt-dlp engine on launch to keep up with YouTube changes.
+* **MP3 Conversion:** Automatically extracts audio and converts it to high-quality MP3 using a native FFmpeg binary.
+* **Anti-Bot Bypass:** Uses the `_NIGHTLY` update channel and client emulation (`android_testsuite`) to bypass YouTube's latest "PO Token" and bot protections.
+* **Multi-Language:** Full support for **English** 🇺🇸 and **Turkish** 🇹🇷 (Auto-detects system language).
+* **Easy Access:** Saves files directly to the public `Downloads/MercuryFile` directory.
+* **Auto-Update:** Checks and updates the internal yt-dlp engine on launch to keep up with YouTube changes.
 
 ---
 
@@ -25,7 +25,7 @@ It uses **yt-dlp** (Nightly builds) and **FFmpeg** to bypass modern YouTube rest
 
 You can download the latest APK from the Releases page:
 
-[** Download Latest APK**][https://github.com/TC-Mercury/Mercury_Converter_for_Android/releases/download/v1.0/MercuryConverter.apk)
+[**Download Latest APK**][https://github.com/TC-Mercury/Mercury_Converter_for_Android/releases/download/v1.0.2/MercuryConverter.apk)
 
 1.  Download `MercuryConverter.apk`.
 2.  Allow installation from unknown sources.
