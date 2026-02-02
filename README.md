@@ -25,7 +25,7 @@ It uses **yt-dlp** (Nightly builds) and **FFmpeg** to bypass modern YouTube rest
 
 You can download the latest APK from the Releases page:
 
-[**Download Latest APK**][https://github.com/TC-Mercury/Mercury_Converter_for_Android/releases/download/v1.0.2/MercuryConverter.apk)
+[**Download Latest APK**](https://github.com/TC-Mercury/Mercury_Converter_for_Android/releases/download/v1.0.4/Mercury-Converter.apk)
 
 1.  Download `MercuryConverter.apk`.
 2.  Allow installation from unknown sources.
@@ -45,9 +45,28 @@ This project solves several complex challenges in Android development:
 * [youtubedl-android](https://github.com/JunkFood02/youtubedl-android) (JunkFood02 Fork)
 * [FFmpeg-Android](https://github.com/JunkFood02/youtubedl-android)
 
+## Developer Notes:
+
+### Important: Emulator Support & APK Size
+This project utilizes `ffmpeg` and `youtubedl` native libraries, which are quite large. To keep the production APK size optimized (~98MB instead of ~200MB), **x86 and x86_64 architectures (Android Emulators)** are excluded by default in `build.gradle`.
+
+**The app will NOT run on standard Android Emulators out of the box.**
+
+If you need to debug on an emulator:
+1. Open `app/build.gradle`.
+2. Locate the `ndk` block inside `defaultConfig`.
+3. Uncomment `abiFilters.add("x86_64"), abiFilters.add("x86")` rows.
+
+```gradle
+ndk {
+....
+    //abiFilters.add("x86_64")
+    //abiFilters.add("x86")
+}
+```
 ---
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 This project is for **educational and personal use only**.
 The developer does not endorse the downloading of copyrighted materials without permission. Please respect YouTube's Terms of Service.
