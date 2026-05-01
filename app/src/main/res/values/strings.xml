@@ -23,4 +23,6 @@
     <string name="library_init_failed">Library Init Failed!</string>
 
     <string name="status_converting">Converting...</string>
+
+    <string name="title_history">Download History</string>
 </resources>

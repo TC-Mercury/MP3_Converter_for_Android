@@ -25,4 +25,5 @@
     <string name="library_init_failed">Kütüphane Başlatma Hatası!</string>
 
     <string name="status_converting">Dönüştürülüyor...</string>
+    <string name="title_history">İndirme Geçmişi</string>
 </resources>

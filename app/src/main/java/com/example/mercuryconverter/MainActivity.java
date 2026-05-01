@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,7 +31,7 @@ import java.util.List;
  */
 
 public class MainActivity extends AppCompatActivity {
-
+    DataBase db;
     private static final String TAG = "MainActivity";
     private static final int PERMISSION_REQUEST_CODE = 101;
 
@@ -47,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        db = new DataBase(this);
+
         editTextLink = findViewById(R.id.editTextLink);
         btnDownload = findViewById(R.id.btnDownload);
         progressBar = findViewById(R.id.progressBar);
@@ -54,6 +57,10 @@ public class MainActivity extends AppCompatActivity {
 
         btnDownload.setEnabled(false);
         btnDownload.setText(R.string.msg_checking_updates);
+        Button btnOpenHistory = findViewById(R.id.btnOpenHistory);
+        btnOpenHistory.setOnClickListener(v -> {
+            showBottomSheetHistory();
+        });
 
         // Try to initialize libraries immediately upon app launch
         try {
@@ -63,9 +70,34 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "Initialization Error", e);
             tvStatus.setText(R.string.init_error);
         }
-
         btnDownload.setOnClickListener(v -> startDownload());
     }
+
+    private void showBottomSheetHistory() {
+        com.google.android.material.bottomsheet.BottomSheetDialog bottomSheetDialog =
+                new com.google.android.material.bottomsheet.BottomSheetDialog(MainActivity.this);
+
+        View bottomSheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_history, null);
+        bottomSheetDialog.setContentView(bottomSheetView);
+
+        androidx.recyclerview.widget.RecyclerView recyclerView =
+                bottomSheetView.findViewById(R.id.recyclerViewHistory);
+
+        recyclerView.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
+
+        android.database.Cursor cursor = db.getAllHistory();
+
+        HistoryAdapter adapter = new HistoryAdapter(this, cursor, new HistoryAdapter.OnItemClickListener() {
+            @Override
+            public void onLinkSelected(String url) {
+                editTextLink.setText(url);
+                bottomSheetDialog.dismiss();
+            }
+        });
+        recyclerView.setAdapter(adapter);
+        bottomSheetDialog.show();
+    }
+
 
     /*
      * Initializes the underlying YoutubeDL and FFmpeg libraries.
@@ -203,6 +235,8 @@ public class MainActivity extends AppCompatActivity {
 
             new Thread(() -> {
                 try {
+                    com.yausername.youtubedl_android.mapper.VideoInfo streamInfo = YoutubeDL.getInstance().getInfo(url);
+                    String videoTitle = streamInfo.getTitle() != null ? streamInfo.getTitle() : "Bilinmeyen Şarkı";
                     YoutubeDLRequest request = new YoutubeDLRequest(url);
 
                     // --- FFMPEG PATH DETECTION ---
@@ -257,6 +291,7 @@ public class MainActivity extends AppCompatActivity {
                         });
                        return null;
                    });
+                   db.addDownload(videoTitle,url,mercuryDir.getAbsolutePath());
 
                     //Media scanner for phone to detect files quickly
                     MediaScannerConnection.scanFile(

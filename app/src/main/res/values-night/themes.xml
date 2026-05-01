@@ -1,7 +1,9 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.MercuryConverter" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
-    </style>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="mercury_primary">#64B5F6</color>
+    <color name="mercury_bg">#121212</color>
+    <color name="mercury_text_main">#E0E0E0</color>
+    <color name="mercury_text_sub">#9E9E9E</color>
+    <color name="mercury_button_text">#121212</color>
+    <color name="mercury_surface">#1E1E1E</color>
 </resources>
