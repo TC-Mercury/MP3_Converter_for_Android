@@ -35,11 +35,12 @@
         android:layout_marginBottom="16dp"
         android:hint="@string/hint_link"
         android:inputType="textUri"
-        android:padding="12dp" />
+        android:padding="12dp"
+        android:textSize="14sp" />
 
     <Button
         android:id="@+id/btnDownload"
-        android:backgroundTint="@color/mercury_primary"
+        android:backgroundTint="@color/btn_state_colors"
         android:textColor="@color/mercury_button_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
