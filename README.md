@@ -15,6 +15,10 @@ It uses **yt-dlp** (Nightly builds) and **FFmpeg** to bypass modern YouTube rest
 
 * **MP3 Conversion:** Automatically extracts audio and converts it to high-quality MP3 using a native FFmpeg binary.
 * **Anti-Bot Bypass:** Uses the `_NIGHTLY` update channel and client emulation (`android_testsuite`) to bypass YouTube's latest "PO Token" and bot protections.
+* **Download History:** A local SQLite database securely saves your past downloads. Easily access your history via a sleek, interactive bottom sheet panel.
+* **Smart Auto-Paste:** Tap any previously downloaded song from your history to instantly paste its URL into the main download bar.
+* **Dark/Light Mode:** Full dynamic theme support that adapts to your system preferences, featuring a custom, eye-friendly "Mercury" color palette.
+* **Modern UI:** A centered, clean, and responsive interface designed for maximum ease of use.
 * **Multi-Language:** Full support for **English** 🇺🇸 and **Turkish** 🇹🇷 (Auto-detects system language).
 * **Easy Access:** Saves files directly to the public `Downloads/MercuryFile` directory.
 * **Auto-Update:** Checks and updates the internal yt-dlp engine on launch to keep up with YouTube changes.
@@ -25,7 +29,7 @@ It uses **yt-dlp** (Nightly builds) and **FFmpeg** to bypass modern YouTube rest
 
 You can download the latest APK from the Releases page:
 
-[**Download Latest APK**](https://github.com/TC-Mercury/Mercury_Converter_for_Android/releases/download/v1.0.4/Mercury-Converter.apk)
+[**Download Latest APK (v1.1.0)**](https://github.com/TC-Mercury/Mercury_Converter_for_Android/releases/download/v1.1.0/Mercury-Converter.apk)
 
 1.  Download `MercuryConverter.apk`.
 2.  Allow installation from unknown sources.
@@ -48,19 +52,17 @@ This project solves several complex challenges in Android development:
 ## Developer Notes:
 
 ### Important: Emulator Support & APK Size
-This project utilizes `ffmpeg` and `youtubedl` native libraries, which are quite large. To keep the production APK size optimized (~98MB instead of ~200MB), **x86 and x86_64 architectures (Android Emulators)** are excluded by default in `build.gradle`.
+This project utilizes `ffmpeg` and `youtubedl` native libraries, which are quite large. To keep the production APK size as optimized as possible (~150MB instead of ~300MB), **x86 architecture (Android Emulator)** is excluded by default in `build.gradle`.
 
 **The app will NOT run on standard Android Emulators out of the box.**
 
 If you need to debug on an emulator:
 1. Open `app/build.gradle`.
 2. Locate the `ndk` block inside `defaultConfig`.
-3. Uncomment `abiFilters.add("x86_64"), abiFilters.add("x86")` rows.
-
+3. Uncomment `abiFilters.add("x86")` row.
 ```gradle
 ndk {
 ....
-    //abiFilters.add("x86_64")
     //abiFilters.add("x86")
 }
 ```
