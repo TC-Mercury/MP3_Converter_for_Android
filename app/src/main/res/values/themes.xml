@@ -4,7 +4,7 @@
         <item name="colorPrimaryVariant">@color/mercury_primary</item>
         <item name="colorOnPrimary">@color/mercury_button_text</item>
         <item name="android:statusBarColor">@color/mercury_bg</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
 
     </style>
 

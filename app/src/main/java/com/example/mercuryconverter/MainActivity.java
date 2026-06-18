@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -225,13 +226,19 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, getString(R.string.error_empty_link), Toast.LENGTH_SHORT).show();
                 return;
             }
+            String youtubeRegex = "^(https?\\:\\/\\/)?(www\\.)?(youtube\\.com|youtu\\.?be|music\\.youtube\\.com)\\/.+$";
 
+            if (!url.matches(youtubeRegex)) {
+                Toast.makeText(this, R.string.error_wrong_link, Toast.LENGTH_SHORT).show();
+                return;
+            }
             ensureMercuryDir();
 
             progressBar.setVisibility(ProgressBar.VISIBLE);
             tvStatus.setText(R.string.status_downloading);
             btnDownload.setEnabled(false);
             editTextLink.setEnabled(false);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
             new Thread(() -> {
                 try {
@@ -272,9 +279,12 @@ public class MainActivity extends AppCompatActivity {
                     // this bypasses the HTTP 400 and "PO Token" errors.
                     request.addOption("--extractor-args", "youtube:player_client=android");
                     request.addOption("--force-ipv4");
-                    request.addOption("--no-check-certificate");
                     request.addOption("--no-playlist");
                     request.addOption("--format", "bestaudio/best");
+                    // --- LEGACY DEVICE SUPPORT ---
+                    if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.N_MR1) {
+                        request.addOption("--no-check-certificate");
+                    }
 
                     //Show download progress and download infos
                     runOnUiThread(() -> {
@@ -305,6 +315,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // Update UI on success
                     runOnUiThread(() -> {
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                         progressBar.setVisibility(ProgressBar.GONE);
                         tvStatus.setText(R.string.msg_completed);
                         btnDownload.setEnabled(true);
@@ -319,6 +330,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // Update UI on failure
                     runOnUiThread(() -> {
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                         progressBar.setVisibility(ProgressBar.GONE);
                         if (msg.contains("ffmpeg")) {
                             tvStatus.setText(R.string.error_conversion_failed);

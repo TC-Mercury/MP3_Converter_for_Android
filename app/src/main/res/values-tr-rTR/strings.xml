@@ -23,6 +23,7 @@
 
     <string name="init_error">Kütüphaneler yüklenemedi</string>
     <string name="library_init_failed">Kütüphane Başlatma Hatası!</string>
+    <string name="error_wrong_link">Lütfen geçerli bir YouTube linki girin!</string>
 
     <string name="status_converting">Dönüştürülüyor...</string>
     <string name="title_history">İndirme Geçmişi</string>

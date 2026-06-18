@@ -23,6 +23,7 @@
     <string name="library_init_failed">Library Init Failed!</string>
 
     <string name="status_converting">Converting...</string>
+    <string name="error_wrong_link">Please paste a valid YouTube link!</string>
 
     <string name="title_history">Download History</string>
 </resources>
