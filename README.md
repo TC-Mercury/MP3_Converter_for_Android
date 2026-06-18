@@ -10,6 +10,50 @@ Mercury Converter is a powerful, native Android application designed to download
 It uses **yt-dlp** (Nightly builds) and **FFmpeg** to bypass modern YouTube restrictions (HTTP 403 / PO Token errors) and ensure high-quality audio extraction.
 
 ---
+## Screenshots
+
+<p align="center">A side-by-side comparison of the new centered UI across themes and core states.</p>
+
+<table align="center" width="100%">
+  <thead>
+    <tr>
+      <th align="center" width="50%"><b>Light Mode</b></th>
+      <th align="center" width="50%"><b>Dark Mode</b></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center">
+        <img width="260" alt="Link Entered (Light)" src="https://github.com/user-attachments/assets/26123d9e-00cc-4cf0-a1e3-f6dfa0648abc" />
+        <br/><em><b>Ready:</b> Valid YouTube URL entered.</em>
+      </td>
+      <td align="center">
+        <img width="260" alt="Link Entered (Dark)" src="https://github.com/user-attachments/assets/6987e8cd-0a0b-46a9-bf8b-6c1d52418b6c" />
+        <br/><em><b>Ready:</b> Valid YouTube URL entered.</em>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img width="260" alt="Active Download (Light)" src="https://github.com/user-attachments/assets/780baf65-2a77-41d5-b1d0-cf9017997319" />
+        <br/><em><b>In Progress:</b> Active converting state.</em>
+      </td>
+      <td align="center">
+        <img width="260" alt="Active Download (Dark)" src="https://github.com/user-attachments/assets/b11eaa64-e550-48bc-8f64-8c76af5a580c" />
+        <br/><em><b>In Progress:</b> Active converting state.</em>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img width="260" alt="Download History (Light)" src="https://github.com/user-attachments/assets/d66c6539-1430-4093-a863-389449a8a68b" />
+        <br/><em><b>History:</b> Bottom Sheet panel.</em>
+      </td>
+      <td align="center">
+        <img width="260" alt="Download History (Dark)" src="https://github.com/user-attachments/assets/7321be84-2ed1-4320-9c52-010360b6ebef" />
+        <br/><em><b>History:</b> Bottom Sheet panel.</em>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ##  Features:
 
@@ -29,7 +73,7 @@ It uses **yt-dlp** (Nightly builds) and **FFmpeg** to bypass modern YouTube rest
 
 You can download the latest APK from the Releases page:
 
-[**Download Latest APK (v1.1.0)**](https://github.com/TC-Mercury/Mercury_Converter_for_Android/releases/download/v1.1.0/Mercury-Converter.apk)
+[**Download Latest APK (v1.1.1)**](https://github.com/TC-Mercury/Mercury_Converter_for_Android/releases/download/v1.1.1/Mercury-Converter.apk)
 
 1.  Download `MercuryConverter.apk`.
 2.  Allow installation from unknown sources.
