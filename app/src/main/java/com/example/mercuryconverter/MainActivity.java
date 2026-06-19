@@ -334,7 +334,7 @@ public class MainActivity extends AppCompatActivity {
                         progressBar.setVisibility(ProgressBar.GONE);
                         if (msg.contains("ffmpeg")) {
                             tvStatus.setText(R.string.error_conversion_failed);
-                            Toast.makeText(MainActivity.this, getString(R.string.error_ffmpeg_not_found), Toast.LENGTH_LONG).show(); // <<< Doğru String kullanılmalı
+                            Toast.makeText(MainActivity.this, getString(R.string.error_ffmpeg_not_found), Toast.LENGTH_LONG).show();
                         } else {
                             tvStatus.setText(getString(R.string.error_prefix) + msg);
                         }
