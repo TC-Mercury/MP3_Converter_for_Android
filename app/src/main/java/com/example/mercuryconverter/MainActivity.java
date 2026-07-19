@@ -2,6 +2,7 @@
 package com.example.mercuryconverter;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -56,6 +57,22 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         tvStatus = findViewById(R.id.tvStatus);
 
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+                String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+                if (sharedText != null) {
+                    String extractedUrl = extractUrl(sharedText);
+                    if (extractedUrl != null) {
+                        editTextLink.setText(extractedUrl);
+                    }
+                }
+            }
+        }
+
         btnDownload.setEnabled(false);
         btnDownload.setText(R.string.msg_checking_updates);
         Button btnOpenHistory = findViewById(R.id.btnOpenHistory);
@@ -74,6 +91,15 @@ public class MainActivity extends AppCompatActivity {
         btnDownload.setOnClickListener(v -> startDownload());
     }
 
+    private String extractUrl(String text) {
+        String urlRegex = "(https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])";
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(urlRegex);
+        java.util.regex.Matcher matcher = pattern.matcher(text);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
+    }
     private void showBottomSheetHistory() {
         com.google.android.material.bottomsheet.BottomSheetDialog bottomSheetDialog =
                 new com.google.android.material.bottomsheet.BottomSheetDialog(MainActivity.this);
