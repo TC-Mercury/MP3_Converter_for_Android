@@ -73,7 +73,7 @@ It uses **yt-dlp** (Nightly builds) and **FFmpeg** to bypass modern YouTube rest
 
 You can download the latest APK from the Releases page:
 
-[**Download Latest APK (v1.1.2)**](https://github.com/TC-Mercury/MP3_Converter_for_Android/releases/download/v1.1.2/Mercury_Converter.apk)
+[**Download Latest APK (v1.2.0)**](https://github.com/TC-Mercury/MP3_Converter_for_Android/releases/download/v1.2.0/Mercury_Converter.apk)
 
 1.  Download `MercuryConverter.apk`.
 2.  Allow installation from unknown sources.
