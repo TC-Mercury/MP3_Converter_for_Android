@@ -28,7 +28,7 @@ It uses **yt-dlp** (Nightly builds) and **FFmpeg** to bypass modern YouTube rest
         <br/><em><b>Ready:</b> Valid YouTube URL entered.</em>
       </td>
       <td align="center">
-        <img width="260" alt="Link Entered (Dark)" src="https://github.com/user-attachments/assets/6987e8cd-0a0b-46a9-bf8b-6c1d52418b6c" />
+        <img width="260" alt="Link Entered (Dark)" src="https://github.com/user-attachments/assets/f72c6e8f-ea04-4a54-99e3-72db96892309" />
         <br/><em><b>Ready:</b> Valid YouTube URL entered.</em>
       </td>
     </tr>
@@ -48,8 +48,18 @@ It uses **yt-dlp** (Nightly builds) and **FFmpeg** to bypass modern YouTube rest
         <br/><em><b>History:</b> Bottom Sheet panel.</em>
       </td>
       <td align="center">
-        <img width="260" alt="Download History (Dark)" src="https://github.com/user-attachments/assets/7321be84-2ed1-4320-9c52-010360b6ebef" />
+        <img width="260" alt="Download History (Dark)" src="https://github.com/user-attachments/assets/87efc015-9257-4206-b110-7ad70e1dfab0" />
         <br/><em><b>History:</b> Bottom Sheet panel.</em>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img width="260" alt="Native Share (Light)" src="https://github.com/user-attachments/assets/8e2c463e-09d0-482b-86c8-f4c50283d436" />
+        <br/><em><b>Integration:</b> Native Android Share Sheet.</em>
+      </td>
+      <td align="center">
+        <img width="260" alt="Native Share (Dark)" src="https://github.com/user-attachments/assets/11702b1b-b572-47ec-ac5c-52a09ea4e2b7" />
+        <br/><em><b>Integration:</b> Native Android Share Sheet.</em>
       </td>
     </tr>
   </tbody>
