@@ -2,11 +2,15 @@
 package com.example.mercuryconverter;
 
 import android.Manifest;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -44,7 +48,67 @@ public class MainActivity extends AppCompatActivity {
 
     // Files will be saved in this directory
     private File mercuryDir;
+    private DownloadService downloadService;
+    private boolean isBound = false;
 
+    private final ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            DownloadService.LocalBinder binder = (DownloadService.LocalBinder) service;
+            downloadService = binder.getService();
+            isBound = true;
+            downloadService.setProgressListener(new DownloadService.ProgressListener() {
+                @Override
+                public void onProgress(int progress, String status) {
+                    runOnUiThread(() -> {
+                        progressBar.setProgress(progress);
+                        tvStatus.setText(status);
+                    });
+                }
+                @Override
+                public void onCompleted(String title, String path) {
+                    runOnUiThread(() -> {
+                        progressBar.setVisibility(ProgressBar.GONE);
+                        tvStatus.setText(R.string.msg_completed);
+                        btnDownload.setEnabled(true);
+                        editTextLink.setEnabled(true);
+                        editTextLink.setText("");
+                        Toast.makeText(MainActivity.this, getString(R.string.msg_saved_to) + " Download/MercuryFile", Toast.LENGTH_LONG).show();
+                    });
+                }
+                @Override
+                public void onError(String error) {
+                    runOnUiThread(() -> {
+                        progressBar.setVisibility(ProgressBar.GONE);
+                        tvStatus.setText(getString(R.string.error_prefix) + error);
+                        btnDownload.setEnabled(true);
+                        editTextLink.setEnabled(true);
+                    });
+                }
+            });
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isBound = false;
+        }
+    };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        syncUiWithServiceState();
+        Intent serviceIntent = new Intent(this, DownloadService.class);
+        bindService(serviceIntent, connection, Context.BIND_ABOVE_CLIENT);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (isBound) {
+            unbindService(connection);
+            isBound = false;
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +153,29 @@ public class MainActivity extends AppCompatActivity {
             tvStatus.setText(R.string.init_error);
         }
         btnDownload.setOnClickListener(v -> startDownload());
+    }
+
+    private void syncUiWithServiceState() {
+        if (DownloadStateHolder.isDownloading) {
+            progressBar.setVisibility(ProgressBar.VISIBLE);
+            progressBar.setProgress(DownloadStateHolder.lastProgress);
+            tvStatus.setText(DownloadStateHolder.lastStatus);
+            btnDownload.setEnabled(false);
+            editTextLink.setEnabled(false);
+        } else if ("completed".equals(DownloadStateHolder.pendingResult)) {
+            progressBar.setVisibility(ProgressBar.GONE);
+            tvStatus.setText(R.string.msg_completed);
+            btnDownload.setEnabled(true);
+            editTextLink.setEnabled(true);
+            editTextLink.setText("");
+            DownloadStateHolder.pendingResult = null; // tüketildi
+        } else if (DownloadStateHolder.pendingResult != null && DownloadStateHolder.pendingResult.startsWith("error:")) {
+            progressBar.setVisibility(ProgressBar.GONE);
+            tvStatus.setText(getString(R.string.error_prefix) + DownloadStateHolder.pendingResult.substring(6));
+            btnDownload.setEnabled(true);
+            editTextLink.setEnabled(true);
+            DownloadStateHolder.pendingResult = null;
+        }
     }
 
     private String extractUrl(String text) {
@@ -161,6 +248,9 @@ public class MainActivity extends AppCompatActivity {
             // For Android 13+
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 listPermissionsNeeded.add(Manifest.permission.READ_MEDIA_AUDIO);
+            }
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(Manifest.permission.POST_NOTIFICATIONS);
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // Android 11+ handles storage permissions differently (Scoped Storage).
@@ -245,129 +335,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Executes the download and conversion process.
-        private void startDownload() {
-            String url = editTextLink.getText().toString().trim();
-
-            if (url.isEmpty()) {
-                Toast.makeText(this, getString(R.string.error_empty_link), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            String youtubeRegex = "^(https?\\:\\/\\/)?(www\\.)?(youtube\\.com|youtu\\.?be|music\\.youtube\\.com)\\/.+$";
-
-            if (!url.matches(youtubeRegex)) {
-                Toast.makeText(this, R.string.error_wrong_link, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            ensureMercuryDir();
-
-            progressBar.setVisibility(ProgressBar.VISIBLE);
-            tvStatus.setText(R.string.status_downloading);
-            btnDownload.setEnabled(false);
-            editTextLink.setEnabled(false);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-            new Thread(() -> {
-                try {
-                    com.yausername.youtubedl_android.mapper.VideoInfo streamInfo = YoutubeDL.getInstance().getInfo(url);
-                    String videoTitle = streamInfo.getTitle() != null ? streamInfo.getTitle() : "Bilinmeyen Şarkı";
-                    YoutubeDLRequest request = new YoutubeDLRequest(url);
-
-                    // --- FFMPEG PATH DETECTION ---
-                    // The library sometimes fails to find the FFmpeg binary automatically.(idk why)
-                    // We check multiple locations manually.
-                    String ffmpegPath = "";
-                    File libJunkfood = new File(getApplicationContext().getApplicationInfo().dataDir, "libffmpeg.so");
-                    File libFiles = new File(getApplicationContext().getFilesDir(), "libffmpeg.so");
-                    File libNative = new File(getApplicationContext().getApplicationInfo().nativeLibraryDir, "libffmpeg.so");
-
-                    if (libJunkfood.exists()) ffmpegPath = libJunkfood.getAbsolutePath();
-                    else if (libFiles.exists()) ffmpegPath = libFiles.getAbsolutePath();
-                    else if (libNative.exists()) ffmpegPath = libNative.getAbsolutePath();
-
-                    // Explicitly tell yt-dlp where FFmpeg is (I spend so much time just for this!)
-                    if (!ffmpegPath.isEmpty()) {
-                        request.addOption("--ffmpeg-location", ffmpegPath);
-                    }
-
-                    // --- AUDIO EXTRACTION SETTINGS ---
-                    request.addOption("-x");
-                    request.addOption("--audio-format", "mp3");
-                    request.addOption("--audio-quality", "0");
-                    request.addOption("--embed-metadata");
-                    request.addOption("--embed-thumbnail");
-                    request.addOption("--add-metadata");
-                    request.addOption("--recode-video", "mp3");
-                    request.addOption("--metadata-from-title", "%(artist)s - %(title)s");
-                    request.addOption("-o", mercuryDir.getAbsolutePath() + "/%(artist)s - %(title)s.%(ext)s");
-
-                    // --- YOUTUBE ANTI-BOT BYPASS ---
-                    // Emulate the official Android client. Since I am using the updated Nightly engine,
-                    // this bypasses the HTTP 400 and "PO Token" errors.
-                    request.addOption("--extractor-args", "youtube:player_client=android");
-                    request.addOption("--force-ipv4");
-                    request.addOption("--no-playlist");
-                    request.addOption("--format", "bestaudio/best");
-                    // --- LEGACY DEVICE SUPPORT ---
-                    if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.N_MR1) {
-                        request.addOption("--no-check-certificate");
-                    }
-
-                    //Show download progress and download infos
-                    runOnUiThread(() -> {
-                        progressBar.setIndeterminate(false);
-                        progressBar.setMax(100);
-                        progressBar.setProgress(0);
-                    });
-
-                   YoutubeDL.getInstance().execute(request, "mercury_process", (progress, etaInSeconds, line) -> {
-                        runOnUiThread(() -> {
-                            int prog = (progress != null) ? progress.intValue() : 0;
-                            progressBar.setProgress(prog);
-                            tvStatus.setText(line);
-                        });
-                       return null;
-                   });
-                   db.addDownload(videoTitle,url,mercuryDir.getAbsolutePath());
-
-                    //Media scanner for phone to detect files quickly
-                    MediaScannerConnection.scanFile(
-                            getApplicationContext(),
-                            new String[]{mercuryDir.getAbsolutePath()},
-                            null,
-                            (path, uri) -> {
-                                Log.i(TAG, "Media Scan completed: " + path);
-                            }
-                    );
-
-                    // Update UI on success
-                    runOnUiThread(() -> {
-                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                        progressBar.setVisibility(ProgressBar.GONE);
-                        tvStatus.setText(R.string.msg_completed);
-                        btnDownload.setEnabled(true);
-                        editTextLink.setEnabled(true);
-                        editTextLink.setText("");
-                        Toast.makeText(MainActivity.this, getString(R.string.msg_saved_to) + "Download/MercuryFile", Toast.LENGTH_LONG).show();
-                    });
-
-                } catch (Exception e) {
-                    Log.e(TAG, "Download error", e);
-                    final String msg = e.getMessage();
-
-                    // Update UI on failure
-                    runOnUiThread(() -> {
-                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                        progressBar.setVisibility(ProgressBar.GONE);
-                        if (msg.contains("ffmpeg")) {
-                            tvStatus.setText(R.string.error_conversion_failed);
-                            Toast.makeText(MainActivity.this, getString(R.string.error_ffmpeg_not_found), Toast.LENGTH_LONG).show();
-                        } else {
-                            tvStatus.setText(getString(R.string.error_prefix) + msg);
-                        }
-                        btnDownload.setEnabled(true);
-                        editTextLink.setEnabled(true);
-                    });
-                }
-            }).start();
+    private void startDownload() {
+        String url = editTextLink.getText().toString().trim();
+        if (url.isEmpty()) {
+            Toast.makeText(this, getString(R.string.error_empty_link), Toast.LENGTH_SHORT).show();
+            return;
         }
+        String youtubeRegex = "^(https?\\:\\/\\/)?(www\\.)?(youtube\\.com|youtu\\.?be|music\\.youtube\\.com)\\/.+$";
+        if (!url.matches(youtubeRegex)) {
+            Toast.makeText(this, R.string.error_wrong_link, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        progressBar.setVisibility(ProgressBar.VISIBLE);
+        tvStatus.setText(R.string.status_downloading);
+        btnDownload.setEnabled(false);
+        editTextLink.setEnabled(false);
+
+        Intent serviceIntent = new Intent(this, DownloadService.class);
+        serviceIntent.putExtra(DownloadService.EXTRA_URL, url);
+        ContextCompat.startForegroundService(this, serviceIntent);
+        bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
+    }
 }

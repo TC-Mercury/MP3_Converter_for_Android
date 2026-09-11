@@ -26,6 +26,14 @@
     <string name="library_init_failed">Kütüphane Başlatma Hatası!</string>
     <string name="error_wrong_link">Lütfen geçerli bir YouTube linki girin!</string>
 
-    <string name="status_converting">Dönüştürülüyor...</string>
+    <string name="status_converting">Dönüştürülüyor</string>
     <string name="title_history">İndirme Geçmişi</string>
+    <string name="notif_channel_name">İndirme Bildirimleri</string>
+    <string name="notif_channel_desc">Mp3 indirme ve dönüştürme durumu</string>
+    <string name="notif_downloading_title">İndiriliyor</string>
+    <string name="notif_preparing">Hazırlanıyor</string>
+    <string name="notif_completed_title">İndirme tamamlandı</string>
+    <string name="notif_failed_title">İndirme başarısız</string>
+    <string name="error_unknown">Bilinmeyen hata</string>
+    <string name="unknown_song">Bilinmeyen Şarkı</string>
 </resources>

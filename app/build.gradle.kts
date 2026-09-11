@@ -10,8 +10,8 @@ android {
         applicationId = "com.example.mercuryconverter"
         minSdk = 24
         targetSdk = 34
-        versionCode = 8
-        versionName = "1.2.1"
+        versionCode = 9
+        versionName = "1.3.0"
 
         ndk {
             abiFilters.add("arm64-v8a")

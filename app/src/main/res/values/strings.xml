@@ -23,8 +23,17 @@
     <string name="init_error">Libraries failed to load</string>
     <string name="library_init_failed">Library Init Failed!</string>
 
-    <string name="status_converting">Converting...</string>
+    <string name="status_converting">Converting</string>
     <string name="error_wrong_link">Please paste a valid YouTube link!</string>
 
     <string name="title_history">Download History</string>
+
+    <string name="notif_channel_name">Download Notifications</string>
+    <string name="notif_channel_desc">Mp3 download and conversion status</string>
+    <string name="notif_downloading_title">Downloading</string>
+    <string name="notif_preparing">Preparing</string>
+    <string name="notif_completed_title">Download Complete</string>
+    <string name="notif_failed_title">Download Failed</string>
+    <string name="error_unknown">Unknown error</string>
+    <string name="unknown_song">Unknown Song</string>
 </resources>
