@@ -11,7 +11,7 @@
     <string name="msg_engine_updated">✅ Engine Updated!</string>
     <string name="msg_update_failed">⚠️ Update Failed (Using Old Engine)</string>
 
-    <string name="status_downloading">Downloading...</string>
+    <string name="status_downloading">Preparing</string>
     <string name="msg_completed">✓ COMPLETED (MP3)</string>
     <string name="msg_saved_to">Saved to: </string>
 

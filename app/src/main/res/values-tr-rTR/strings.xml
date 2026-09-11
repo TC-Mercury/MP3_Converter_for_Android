@@ -12,8 +12,7 @@
     <string name="msg_engine_updated">✅ Motor Güncellendi!</string>
     <string name="msg_update_failed">⚠️ Güncelleme Başarısız (Eski Motor)</string>
 
-    <string name="status_downloading">İndiriliyor...</string>
-
+    <string name="status_downloading">Hazırlanıyor</string>
     <string name="msg_completed">✓ TAMAMLANDI (MP3)</string>
     <string name="msg_saved_to">Kaydedildi: </string>
 
