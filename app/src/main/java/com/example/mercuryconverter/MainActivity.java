@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
                         editTextLink.setEnabled(true);
                         editTextLink.setText("");
                         Toast.makeText(MainActivity.this, getString(R.string.msg_saved_to) + " Download/MercuryFile", Toast.LENGTH_LONG).show();
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     });
                 }
                 @Override
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
                         tvStatus.setText(getString(R.string.error_prefix) + error);
                         btnDownload.setEnabled(true);
                         editTextLink.setEnabled(true);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     });
                 }
             });
@@ -107,6 +109,27 @@ public class MainActivity extends AppCompatActivity {
         if (isBound) {
             unbindService(connection);
             isBound = false;
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+
+        String action = intent.getAction();
+        String type = intent.getType();
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+                String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+                if (sharedText != null) {
+                    String extractedUrl = extractUrl(sharedText);
+                    if (extractedUrl != null) {
+                        editTextLink.setText(extractedUrl);
+                    }
+                }
+            }
         }
     }
     @Override
@@ -162,18 +185,21 @@ public class MainActivity extends AppCompatActivity {
             tvStatus.setText(DownloadStateHolder.lastStatus);
             btnDownload.setEnabled(false);
             editTextLink.setEnabled(false);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         } else if ("completed".equals(DownloadStateHolder.pendingResult)) {
             progressBar.setVisibility(ProgressBar.GONE);
             tvStatus.setText(R.string.msg_completed);
             btnDownload.setEnabled(true);
             editTextLink.setEnabled(true);
             editTextLink.setText("");
-            DownloadStateHolder.pendingResult = null; // tüketildi
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            DownloadStateHolder.pendingResult = null;
         } else if (DownloadStateHolder.pendingResult != null && DownloadStateHolder.pendingResult.startsWith("error:")) {
             progressBar.setVisibility(ProgressBar.GONE);
             tvStatus.setText(getString(R.string.error_prefix) + DownloadStateHolder.pendingResult.substring(6));
             btnDownload.setEnabled(true);
             editTextLink.setEnabled(true);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             DownloadStateHolder.pendingResult = null;
         }
     }
@@ -356,5 +382,6 @@ public class MainActivity extends AppCompatActivity {
         serviceIntent.putExtra(DownloadService.EXTRA_URL, url);
         ContextCompat.startForegroundService(this, serviceIntent);
         bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 }
